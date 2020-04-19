@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+    - name: liveness
+      image: k8s.gr.io/busybox
+      args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy;sleep 30; rm -rf /tmp/healthy; sleep 600
+      livenessProbe:
+        exec:
+          command:
+            - cat
+            - /tmp/healthy
+        initialDelaySeconds: 5
+        periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-http
+spec:
+  containers:
+    - name: livenesss
+      image: k8s.gcr.io/liveness
+      args:
+        - /server
+      livenessProbe:
+        httpGet:
+          port: 8080
+          path: /healthy
+          httpHeaders:
+            - name: Costom Header
+              value: Awence
+        initialDelaySeconds: 10
+        periodSeconds: 10
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: goproxy
+  name: goproxy
+spec:
+  containers:
+    - name: goproxy
+      image: k8s.gcr.io/goproxy:0.1
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 10
+      livenessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 10

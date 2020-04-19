@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: intelmake
+  namespace: chentest
+spec:
+  type: NodePort
+  ports:
+    - port: 8031
+      name: python-server
+      targetPort: 8080
+      nodePort: 30801
+      protocol: TCP
+  selector:
+    app: service_test_pod

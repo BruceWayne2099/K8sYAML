@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-pod
+  namespace: demo-ns
+  labels:
+    app: front
+    k1: v1
+spec:
+  containers:
+    - name: demo-container
+      image: nginx:latest
+  nodeSelector:
+    k1: v1
+
+    # 比如调度到带有k1=v1这个node上，调度方法比较硬性直接
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-pod
+  namespace: demo-namespace
+spec:
+  containers:
+    - name: demo-container
+      image: nginx:latest
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: k1
+                operator: In    #这里除了Exists/DoesNotExists之外，还可以Gt/Lt(数值比较）
+                values:
+                  - v2
+                  - v3
+  # 将此pod调度到k1=v2 或者k1=v3的node上
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: demo-node
+spec:
+  taints:
+    - effect: "NoSchedule"  #Taint的行为，禁止调度过来，PreferNoSchedule是最好不要调度过来，NoExecute是不仅新的不会来，老的还会被驱逐
+      timeAdded: null
+      key: "k1"
+      value: "v1"
+
+  # 给此node创建一个污点,node可以有多个Taints
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: demo-ns
+  name: demo-pod
+spec:
+  containers:
+    - name: demo-container
+      image: nginx:latest
+  tolerations:
+    - key: "k1"
+      operator: "Equal"   #要不然就是Exists
+      value: "v1"
+      effect: "NoSchedule"    #这里可以为空，匹配所有  取值要与Taints的Effect一致
+      tolerationSeconds: 400
+
+  # pod可以有多个tolerations

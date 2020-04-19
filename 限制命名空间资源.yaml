@@ -1,0 +1,20 @@
+kind: ResourceQuota
+apiVersion: v1
+metadata:
+  name: demo-quota
+  namespace: demo-ns
+spec:
+  hard:
+    persistantvolumeclaims: "2"
+    cpu: "1000"     # 限制该命名空间使用的总cpu request
+    memory: 200Gi
+    pods: "20"
+    services.loadbalancers: "2"
+    services.nodeports: "2"
+  scopeSelector:
+    matchExpressions:
+      - operator: Exists
+        scopeName: NotBestEffort
+
+
+        # 限制demo-ns这个命名空间里的资源

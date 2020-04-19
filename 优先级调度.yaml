@@ -1,0 +1,60 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high
+value: 10000
+globalDefault: false
+preemptionPolicy: Never     #君子，不会强抢别人资源，就是排队
+description: "这里是注释！"
+#创建了一个名叫high的priorityClass，得分为10000，优先级高
+
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low
+value: 100
+globalDefault: false    #如果这里是true就是集群默认的PriorityClass,任何没有配置该字段的pod，都是以此值为优先级。
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: demo-ns
+  name: demo-pod
+  labels:
+    k1: v1
+  annotations:
+    name: XXX
+spec:
+  containers:
+    - name: demo-containers
+      image: nginx:latest
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 2
+          memory: 100mi
+      ports:
+        - containerPort: 80
+          name: HTTPD
+          protocol: TCP
+      lifecycle:
+        postStart:    #容器运行之前的任务
+          exec:
+            command:
+              - "sh"
+              - "yum update -y"
+        preStop:    #容器结束之前运行的任务
+          exec:
+            command: ['service httpd stop']
+  restartPolicy: Never
+  schedulerName: default-scheduler
+  nodeName: node-n1
+  priorityClassName: high
+  nodeSelector:
+    zone: node1
+status:
+  conditions:
+    - status: niubi
+      type: dd

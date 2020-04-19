@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Node
+metadata:
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/hostname: node-n1
+  name: node-n1
+spec:
+  externalID: node-n1
+status:
+  addresses:
+    - address: 10.162.197.135
+      type: InternalIP
+  allocatable:
+    cpu: "8"
+    memory: 16309412Ki
+    pods: "110"
+  capacity:
+    cpu: "8"
+    memory: 16411812Ki
+    pods: "110"
+  conditions:
+    - status:
+      type:
+  daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+  images:
+    - names:
+  nodeInfo:
+    architecture:
+    bootID:
+    containerRuntimeVersion:
+    kernelVersion:
+    kubeProxyVersion:
+    kubeletVersion:
+    machineID:
+    operatingSystem:
+    osImage:
+    systemUUID:
